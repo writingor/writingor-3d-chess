@@ -1,6 +1,6 @@
-import { PiecesInterface } from "./types";
+import { PiecesInterface } from './types'
 
 export const defaultPieces: PiecesInterface = {
     black: {},
-    white: {},
-};
+    white: {}
+}

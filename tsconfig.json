@@ -1,17 +1,29 @@
 {
-  "compilerOptions": {
-    "baseUrl": "./src",
-    "paths": {
-      "@app/*": ["app/*"],
-      "@features/*": ["features/*"],
-      "@entities/*": ["entities/*"],
-      "@shared/*": ["shared/*"]
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "@app/*": [
+                "app/*"
+            ],
+            "@features/*": [
+                "features/*"
+            ],
+            "@entities/*": [
+                "entities/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
+        },
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "jsx": "react-jsx",
+        "strict": true
     },
-    "esModuleInterop": true, // Enable esModuleInterop for CommonJS compatibility
-    "allowSyntheticDefaultImports": true,
-    "moduleResolution": "node",
-    "jsx": "react", // Add this line for React JSX support
-    "strict": true
-  },
-  "include": ["src/**/*"]
+    "include": [
+        "src/**/*"
+    ]
 }
