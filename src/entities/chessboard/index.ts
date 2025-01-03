@@ -1,6 +1,7 @@
-import { PieceFactory, Piece } from "../piece";
+import { PieceFactory } from "../piece";
 import * as THREE from "three";
 import { CellInterface, PiecesInterface } from "./types";
+import { IPiece, PieceColor, PieceType } from "@entities/piece/single/types";
 
 const defaultPieces: PiecesInterface = {
   black: {},
@@ -29,7 +30,7 @@ export class ChessBoard {
     window.dispatchEvent(this.piecesPlacedEvent);
   }
 
-  addPieceToFenBoard(piece: Piece, color: string, board: string[][]) {
+  addPieceToFenBoard(piece: IPiece, color: string, board: string[][]) {
     if (!piece.isEaten) {
       const
         column = piece.cell.charAt(0),
@@ -48,10 +49,10 @@ export class ChessBoard {
       .fill("")
       .map(() => Array(8).fill(""));
 
-    Object.values(this.pieces.black).forEach((piece: Piece) =>
+    Object.values(this.pieces.black).forEach((piece: IPiece) =>
       this.addPieceToFenBoard(piece, "black", board)
     );
-    Object.values(this.pieces.white).forEach((piece: Piece) =>
+    Object.values(this.pieces.white).forEach((piece: IPiece) =>
       this.addPieceToFenBoard(piece, "white", board)
     );
 
@@ -96,7 +97,7 @@ export class ChessBoard {
   };
 
   getPieceByUUID = (uuid: string) => {
-    let found: Piece | null = null;
+    let found: IPiece | null = null;
 
     for (let color of ["white", "black"] as ("white" | "black")[]) {
       for (let pieceKey in this.pieces[color]) {
@@ -115,7 +116,7 @@ export class ChessBoard {
   };
 
   getPieceByCell = (cell: string) => {
-    let found: Piece | null = null;
+    let found: IPiece | null = null;
 
     for (let color of ["white", "black"] as ("white" | "black")[]) {
       for (let pieceKey in this.pieces[color]) {
@@ -134,8 +135,6 @@ export class ChessBoard {
   };
 
   removePiece(objectToRemove) {
-    console.log('WILL BE REMOVED', objectToRemove)
-
     if (objectToRemove.parent) {
       objectToRemove.parent.remove(objectToRemove);
     
@@ -145,7 +144,7 @@ export class ChessBoard {
   }
 
   getSelectedPiece = () => {
-    let found: Piece | null = null;
+    let found: IPiece | null = null;
 
     for (let color of ["white", "black"] as ("white" | "black")[]) {
       for (let pieceKey in this.pieces[color]) {
@@ -164,7 +163,7 @@ export class ChessBoard {
   };
 
   getPieceByObject = (object: THREE.Group | THREE.Mesh) => {
-    let found: Piece | null = null;
+    let found: IPiece | null = null;
 
     for (let color of ["white", "black"] as ("white" | "black")[]) {
       for (let pieceKey in this.pieces[color]) {
@@ -321,8 +320,8 @@ export class ChessBoard {
       // white
       case "WhiteKing1":
         this.pieces.white.king = PieceFactory.create(
-          "king",
-          "white",
+          PieceType.KING,
+          PieceColor.WHITE,
           1,
           object
         );
@@ -331,8 +330,8 @@ export class ChessBoard {
 
       case "WhiteQueen1":
         this.pieces.white.queen = PieceFactory.create(
-          "queen",
-          "white",
+          PieceType.QUEEN,
+          PieceColor.WHITE,
           1,
           object
         );
@@ -341,8 +340,8 @@ export class ChessBoard {
 
       case "WhiteRook1":
         this.pieces.white.rook1 = PieceFactory.create(
-          "rook",
-          "white",
+          PieceType.ROOK,
+          PieceColor.WHITE,
           1,
           object
         );
@@ -351,8 +350,8 @@ export class ChessBoard {
 
       case "WhiteRook2":
         this.pieces.white.rook2 = PieceFactory.create(
-          "rook",
-          "white",
+          PieceType.ROOK,
+          PieceColor.WHITE,
           2,
           object
         );
@@ -361,8 +360,8 @@ export class ChessBoard {
 
       case "WhiteKnight1":
         this.pieces.white.knight1 = PieceFactory.create(
-          "knight",
-          "white",
+          PieceType.KNIGHT,
+          PieceColor.WHITE,
           1,
           object
         );
@@ -371,8 +370,8 @@ export class ChessBoard {
 
       case "WhiteKnight2":
         this.pieces.white.knight2 = PieceFactory.create(
-          "knight",
-          "white",
+          PieceType.KNIGHT,
+          PieceColor.WHITE,
           2,
           object
         );
@@ -381,8 +380,8 @@ export class ChessBoard {
 
       case "WhiteBishop1":
         this.pieces.white.bishop1 = PieceFactory.create(
-          "bishop",
-          "white",
+          PieceType.BISHOP,
+          PieceColor.WHITE,
           1,
           object
         );
@@ -391,8 +390,8 @@ export class ChessBoard {
 
       case "WhiteBishop2":
         this.pieces.white.bishop2 = PieceFactory.create(
-          "bishop",
-          "white",
+          PieceType.BISHOP,
+          PieceColor.WHITE,
           2,
           object
         );
@@ -401,8 +400,8 @@ export class ChessBoard {
 
       case "WhitePawn1":
         this.pieces.white.pawn1 = PieceFactory.create(
-          "pawn",
-          "white",
+          PieceType.PAWN,
+          PieceColor.WHITE,
           1,
           object
         );
@@ -411,8 +410,8 @@ export class ChessBoard {
 
       case "WhitePawn2":
         this.pieces.white.pawn2 = PieceFactory.create(
-          "pawn",
-          "white",
+          PieceType.PAWN,
+          PieceColor.WHITE,
           2,
           object
         );
@@ -421,8 +420,8 @@ export class ChessBoard {
 
       case "WhitePawn3":
         this.pieces.white.pawn3 = PieceFactory.create(
-          "pawn",
-          "white",
+          PieceType.PAWN,
+          PieceColor.WHITE,
           3,
           object
         );
@@ -431,8 +430,8 @@ export class ChessBoard {
 
       case "WhitePawn4":
         this.pieces.white.pawn4 = PieceFactory.create(
-          "pawn",
-          "white",
+          PieceType.PAWN,
+          PieceColor.WHITE,
           4,
           object
         );
@@ -441,8 +440,8 @@ export class ChessBoard {
 
       case "WhitePawn5":
         this.pieces.white.pawn5 = PieceFactory.create(
-          "pawn",
-          "white",
+          PieceType.PAWN,
+          PieceColor.WHITE,
           5,
           object
         );
@@ -451,8 +450,8 @@ export class ChessBoard {
 
       case "WhitePawn6":
         this.pieces.white.pawn6 = PieceFactory.create(
-          "pawn",
-          "white",
+          PieceType.PAWN,
+          PieceColor.WHITE,
           6,
           object
         );
@@ -461,8 +460,8 @@ export class ChessBoard {
 
       case "WhitePawn7":
         this.pieces.white.pawn7 = PieceFactory.create(
-          "pawn",
-          "white",
+          PieceType.PAWN,
+          PieceColor.WHITE,
           7,
           object
         );
@@ -471,8 +470,8 @@ export class ChessBoard {
 
       case "WhitePawn8":
         this.pieces.white.pawn8 = PieceFactory.create(
-          "pawn",
-          "white",
+          PieceType.PAWN,
+          PieceColor.WHITE,
           8,
           object
         );
@@ -482,8 +481,8 @@ export class ChessBoard {
       // black
       case "BlackKing1":
         this.pieces.black.king = PieceFactory.create(
-          "king",
-          "black",
+          PieceType.KING,
+          PieceColor.BLACK,
           1,
           object
         );
@@ -492,8 +491,8 @@ export class ChessBoard {
 
       case "BlackQueen1":
         this.pieces.black.queen = PieceFactory.create(
-          "queen",
-          "black",
+          PieceType.QUEEN,
+          PieceColor.BLACK,
           1,
           object
         );
@@ -502,8 +501,8 @@ export class ChessBoard {
 
       case "BlackRook1":
         this.pieces.black.rook1 = PieceFactory.create(
-          "rook",
-          "black",
+          PieceType.ROOK,
+          PieceColor.BLACK,
           1,
           object
         );
@@ -512,8 +511,8 @@ export class ChessBoard {
 
       case "BlackRook2":
         this.pieces.black.rook2 = PieceFactory.create(
-          "rook",
-          "black",
+          PieceType.ROOK,
+          PieceColor.BLACK,
           2,
           object
         );
@@ -522,8 +521,8 @@ export class ChessBoard {
 
       case "BlackKnight1":
         this.pieces.black.knight1 = PieceFactory.create(
-          "knight",
-          "black",
+          PieceType.KNIGHT,
+          PieceColor.BLACK,
           1,
           object
         );
@@ -532,8 +531,8 @@ export class ChessBoard {
 
       case "BlackKnight2":
         this.pieces.black.knight2 = PieceFactory.create(
-          "knight",
-          "black",
+          PieceType.KNIGHT,
+          PieceColor.BLACK,
           2,
           object
         );
@@ -542,8 +541,8 @@ export class ChessBoard {
 
       case "BlackBishop1":
         this.pieces.black.bishop1 = PieceFactory.create(
-          "bishop",
-          "black",
+          PieceType.BISHOP,
+          PieceColor.BLACK,
           1,
           object
         );
@@ -552,8 +551,8 @@ export class ChessBoard {
 
       case "BlackBishop2":
         this.pieces.black.bishop2 = PieceFactory.create(
-          "bishop",
-          "black",
+          PieceType.BISHOP,
+          PieceColor.BLACK,
           2,
           object
         );
@@ -562,8 +561,8 @@ export class ChessBoard {
 
       case "BlackPawn1":
         this.pieces.black.pawn1 = PieceFactory.create(
-          "pawn",
-          "black",
+          PieceType.PAWN,
+          PieceColor.BLACK,
           1,
           object
         );
@@ -572,8 +571,8 @@ export class ChessBoard {
 
       case "BlackPawn2":
         this.pieces.black.pawn2 = PieceFactory.create(
-          "pawn",
-          "black",
+          PieceType.PAWN,
+          PieceColor.BLACK,
           2,
           object
         );
@@ -582,8 +581,8 @@ export class ChessBoard {
 
       case "BlackPawn3":
         this.pieces.black.pawn3 = PieceFactory.create(
-          "pawn",
-          "black",
+          PieceType.PAWN,
+          PieceColor.BLACK,
           3,
           object
         );
@@ -592,8 +591,8 @@ export class ChessBoard {
 
       case "BlackPawn4":
         this.pieces.black.pawn4 = PieceFactory.create(
-          "pawn",
-          "black",
+          PieceType.PAWN,
+          PieceColor.BLACK,
           4,
           object
         );
@@ -602,8 +601,8 @@ export class ChessBoard {
 
       case "BlackPawn5":
         this.pieces.black.pawn5 = PieceFactory.create(
-          "pawn",
-          "black",
+          PieceType.PAWN,
+          PieceColor.BLACK,
           5,
           object
         );
@@ -612,8 +611,8 @@ export class ChessBoard {
 
       case "BlackPawn6":
         this.pieces.black.pawn6 = PieceFactory.create(
-          "pawn",
-          "black",
+          PieceType.PAWN,
+          PieceColor.BLACK,
           6,
           object
         );
@@ -622,8 +621,8 @@ export class ChessBoard {
 
       case "BlackPawn7":
         this.pieces.black.pawn7 = PieceFactory.create(
-          "pawn",
-          "black",
+          PieceType.PAWN,
+          PieceColor.BLACK,
           7,
           object
         );
@@ -632,8 +631,8 @@ export class ChessBoard {
 
       case "BlackPawn8":
         this.pieces.black.pawn8 = PieceFactory.create(
-          "pawn",
-          "black",
+          PieceType.PAWN,
+          PieceColor.BLACK,
           8,
           object
         );

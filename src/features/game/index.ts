@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { ThreeEvent } from "@react-three/fiber";
-import { ChessBoard } from "../../entities/chessboard";
+import { ChessBoard } from "@entities/chessboard";
 import { Chess } from 'chess.js';
-import { Piece } from "../../entities/piece";
+import { IPiece } from "@entities/piece/single/types";
 
 const chess = new Chess();
 
@@ -33,13 +33,9 @@ export class Game {
 
       const cell = this.chessBoard?.scene?.getObjectByName(to)
       this.eatPiece(to)
-
-      console.log('COPM cell' ,cell)
       
       if (cell) {
         const piece = this.chessBoard?.getPieceByCell(from)
-
-        console.log('COPM piece BEFORE moving' ,piece)
       
         piece?.object?.position.set(
           cell.position.x,
@@ -49,12 +45,9 @@ export class Game {
 
         piece?.setCell(to)
 
-        console.log('COPM piece AFTER moving' ,piece)
       }
 
       chess.move({from, to});
-
-      console.log(chess.ascii())
 
       if (chess.isGameOver()) {
         console.log("Game over!");
@@ -82,7 +75,7 @@ export class Game {
     }
   }
 
-  getAvailableMoves(piece: Piece) {
+  getAvailableMoves(piece: IPiece) {
     const moves = chess.moves({ verbose: true });
   
     const validMoves = moves.filter(move => move.from === piece.cell);
@@ -191,9 +184,6 @@ export class Game {
 
         this.chessBoard.unselectCells()
 
-
-        console.log('USER MOVED THIS', piece)
-  
         if (chess.isGameOver()) {
           console.log("Game over!");
         } else {
