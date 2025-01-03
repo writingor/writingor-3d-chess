@@ -1,35 +1,76 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import React, { Suspense, useEffect } from "react";
+import { Canvas, ThreeEvent, useLoader } from "@react-three/fiber";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { ChessBoard } from "./entities/chessboard";
+import { Game } from "./features/game";
 
-function App() {
-  const [count, setCount] = useState(0)
+/**
+ * Root
+ * nececcary classes
+ */
+const chessBoard = new ChessBoard();
+const game = new Game();
 
+/**
+ * App
+ * @returns React Component
+ */
+const App: React.FC = () => {
+  /**
+   * Load 3D scene
+   */
+  const gltf = useLoader(GLTFLoader, "/src/assets/objects/chess/board.glb");
+
+  /**
+   * Move Piece on board
+   * 
+   * @param event ThreeJS Event Click
+   */
+  const handleClick = (event: ThreeEvent<PointerEvent>) => {
+    game.play(event)
+  }
+
+  /**
+   * Update
+   * Game and ChessBoard
+   * data
+   */
+  useEffect(() => {
+    if (gltf && gltf.scene) {
+      chessBoard.setScene(gltf.scene)
+
+      if (chessBoard) {
+        game.setChessBoard(chessBoard)
+        chessBoard.fillChessBoard(gltf.scene);
+      }
+
+      gltf.scene.rotation.set(0, 1.58, 0)
+    }
+  }, [gltf]);
+
+  /**
+   * Render APP Component
+   */
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div style={{ width: "100vw", height: "100vh" }}>
+      <Suspense>
+        <Canvas camera={{ position: [-20, 30, 0] }} shadows>
+          <directionalLight
+            position={[-2, 6, 5]}
+            castShadow
+            intensity={Math.PI * 1}
+          />
+          <primitive
+            object={gltf.scene}
+            position={[15, 0, 0]}
+            children-0-castShadow
+            onClick={handleClick}
+          />
+        </Canvas>
+      </Suspense>
+    </div>
+  );
+};
 
-export default App
+export default App;
