@@ -1,28 +1,28 @@
 import * as THREE from "three";
+import { DimentionsType } from "./types";
 
 const defaultPositions: { [key: string]: { [key: string]: string[] } } = {
-    white: {
-      king: ["e1"],
-      queen: ["d1"],
-      rook: ["a1", "h1"],
-      bishop: ["c1", "f1"],
-      knight: ["b1", "g1"],
-      pawn: ["a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"],
-    },
-    black: {
-      king: ["e8"],
-      queen: ["d8"],
-      rook: ["a8", "h8"],
-      bishop: ["c8", "f8"],
-      knight: ["b8", "g8"],
-      pawn: ["a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7"],
-    },
+  white: {
+    king: ["e1"],
+    queen: ["d1"],
+    rook: ["a1", "h1"],
+    bishop: ["c1", "f1"],
+    knight: ["b1", "g1"],
+    pawn: ["a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"],
+  },
+  black: {
+    king: ["e8"],
+    queen: ["d8"],
+    rook: ["a8", "h8"],
+    bishop: ["c8", "f8"],
+    knight: ["b8", "g8"],
+    pawn: ["a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7"],
+  },
 };
 
 export class Piece {
   type: string;
   name: string;
-  position: { x: number; y: number; z: number };
   cell: string;
   isSelected: boolean;
   color: string;
@@ -39,12 +39,11 @@ export class Piece {
     weight: number,
     isSelected: boolean = false,
     isEaten: boolean = false,
-    object: THREE.Group | THREE.Mesh | null = null
+    object: THREE.Group | THREE.Mesh | null = null,
   ) {
     this.type = type;
     this.name = name;
     this.cell = cell;
-    this.position = position;
     this.color = color;
     this.weight = weight;
     this.isSelected = isSelected;
@@ -52,23 +51,23 @@ export class Piece {
     this.object = object;
   }
 
-  setPosition(newPosition: { x: number; y: number; z: number }) {
-    this.position = newPosition;
-  }
-
-  setCell(newCell: string) {
-    this.cell = newCell;
+  setCell(cell: string) {
+    this.cell = cell;
   }
 
   setIsSelected(isSelected: boolean) {
     this.isSelected = isSelected;
 
     if (this.object && this.object instanceof THREE.Mesh) {
-        if (isSelected && this.object.material && !Array.isArray(this.object.material)) {
-          this.object.material.color.set(0xff0000);
-        } else {
-          this.object.material.color.set(this.color);
-        }
+      if (
+        isSelected &&
+        this.object.material &&
+        !Array.isArray(this.object.material)
+      ) {
+        this.object.material.color.set(0xff0000);
+      } else {
+        this.object.material.color.set(this.color);
+      }
     }
   }
 
@@ -92,7 +91,7 @@ export class PieceFactory {
       type.charAt(0).toUpperCase() + type.slice(1)
     }${index}`;
 
-    let weight = 0;
+    let weight = 0
 
     switch (type) {
       case "king":
@@ -126,7 +125,7 @@ export class PieceFactory {
       weight,
       false,
       false,
-      object
+      object,
     );
   }
 }

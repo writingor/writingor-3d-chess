@@ -12,8 +12,12 @@
   "dependencies": {
     "@react-three/drei": "^9.120.5",
     "@react-three/fiber": "^8.17.10",
+    "chess.js": "^1.0.0-beta.8",
+    "js-chess-engine": "^1.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "stockfish": "^16.0.0",
+    "stockfish.js": "^10.0.2",
     "three": "^0.172.0",
     "three-stdlib": "^2.35.2"
   },
