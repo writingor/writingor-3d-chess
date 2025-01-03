@@ -30,6 +30,50 @@ export class Game {
   }
 
   /**
+   * HighLight cells
+   */
+  highlightCells() {
+    if (!this.chessBoard) return;
+
+    const selectedPiece = this.chessBoard.getSelectedPiece();
+
+    if (!selectedPiece) return;
+
+    const letters = ["a", "b", "c", "d", "e", "f", "g", "h"].reverse();
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8];
+
+    const letter = selectedPiece.cell.charAt(0),
+      num = parseInt(selectedPiece.cell.charAt(1));
+
+    // clear color
+    Object.values(this.chessBoard?.cells).forEach((cell) => {
+        cell.object.material.color.set(cell.initialColor);
+        cell.isAllowed = false
+      });
+
+    // highlite
+    Object.values(this.chessBoard?.cells).forEach((cell) => {
+      selectedPiece.dimensions.forEach((dim) => {
+        if (
+          cell.object.name.charAt(0) ===
+            letters[letters.indexOf(letter) + dim.x] &&
+          parseInt(cell.object.name.charAt(1)) ===
+            numbers[numbers.indexOf(num) + dim.y]
+        ) {
+
+          let pieceOnTargetCell = this.chessBoard.getPieceByCell(cell.name)
+          
+          // we play as white
+          if (!pieceOnTargetCell || pieceOnTargetCell.color === 'black') {
+            cell.object.material.color.set(0xff0000);
+            cell.isAllowed = true
+          }
+        }
+      });
+    });
+  }
+
+  /**
    * Select current Piece
    *
    * @param object
@@ -49,6 +93,8 @@ export class Game {
 
     this.chessBoard.setSelectedPieceUUID(object.uuid);
 
+    this.highlightCells();
+
     this.delayAfterMatch();
   }
 
@@ -60,6 +106,10 @@ export class Game {
    */
   movePiece(object: THREE.Group | THREE.Mesh) {
     if (!this.chessBoard) return;
+
+    let cell = this.chessBoard.cells[object.name]
+
+    if (!this.chessBoard.cells[object.name] || !cell.isAllowed) return
 
     this.chessBoard.setIsFirstObjectFound(true);
 
@@ -90,6 +140,12 @@ export class Game {
         });
         piece.setIsSelected(false);
         this.chessBoard.setSelectedPieceUUID("");
+
+        // clear color
+        Object.values(this.chessBoard?.cells).forEach((cell) => {
+          cell.object.material.color.set(cell.initialColor);
+          cell.isAllowed = false
+        });
       }
     }
 
@@ -117,9 +173,10 @@ export class Game {
 
     if (this.chessBoard.getPieceByObject(event.object)) {
       this.selectPiece(event.object);
-      
     } else if (event.object?.parent?.name === "Grid") {
       this.movePiece(event.object);
     }
+
+    console.log(this.chessBoard);
   };
 }

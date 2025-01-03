@@ -1,6 +1,6 @@
 import { PieceFactory, Piece } from "../piece";
 import * as THREE from "three";
-import { PiecesInterface } from "./types";
+import { CellInterface, PiecesInterface } from "./types";
 
 const defaultPieces: PiecesInterface = {
     black: {},
@@ -9,14 +9,14 @@ const defaultPieces: PiecesInterface = {
 
 export class ChessBoard {
   scene: THREE.Group | null;
-  cells: THREE.Mesh[];
+  cells: CellInterface;
   pieces: PiecesInterface;
   selectedPieceUUID: string;
   isFirstObjectFound: boolean;
 
   constructor(
     scene: THREE.Group | null = null,
-    cells: THREE.Mesh[] = [],
+    cells: CellInterface = {},
     pieces: PiecesInterface = defaultPieces,
     selectedPieceUUID: string = '',
     isFirstObjectFound: boolean = false
@@ -48,6 +48,44 @@ export class ChessBoard {
         let piece = this.pieces[color][pieceKey];
 
         if (piece.object && piece.object.uuid === uuid) {
+          found = piece;
+          break;
+        }
+      }
+
+      if (found) break;
+    }
+
+    return found;
+  };
+
+  getPieceByCell = (cell: string) => {
+    let found: Piece | null = null;
+
+    for (let color of ["white", "black"] as ("white" | "black")[]) {
+      for (let pieceKey in this.pieces[color]) {
+        let piece = this.pieces[color][pieceKey];
+
+        if (piece.object && piece.cell === cell) {
+          found = piece;
+          break;
+        }
+      }
+
+      if (found) break;
+    }
+
+    return found;
+  };
+
+  getSelectedPiece = () => {
+    let found: Piece | null = null;
+
+    for (let color of ["white", "black"] as ("white" | "black")[]) {
+      for (let pieceKey in this.pieces[color]) {
+        let piece = this.pieces[color][pieceKey];
+
+        if (piece.isSelected) {
           found = piece;
           break;
         }
@@ -119,7 +157,7 @@ export class ChessBoard {
         const squareSize = Math.min(width, depth) / 8; // 8x8 grid, so divide by 8
 
         const squares: THREE.Mesh[] = [];
-        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"].reverse();
         const numbers = [1, 2, 3, 4, 5, 6, 7, 8];
 
         // Create the squares as 3D meshes and add them to the array
@@ -143,14 +181,16 @@ export class ChessBoard {
             square.position.set(xPos, 0, zPos); // Set the position of each square
             square.name = squareName;
 
-            squares.push(square); // Add the square mesh to the array
+            object.add(square);
+
+            this.cells[square.name] = {
+              initialColor: isBlack ? "black" : "white",
+              object: square,
+              isAllowed: false,
+              name: square.name
+            }
           }
         }
-
-        squares?.forEach((i: THREE.Mesh) => {
-            object.add(i);
-            this.cells.push(i)
-        });
       }
     }
   };

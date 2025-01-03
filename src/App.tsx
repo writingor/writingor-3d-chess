@@ -5,6 +5,8 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { ChessBoard } from "./entities/chessboard";
 import { Game } from "./features/game";
 
+let wasInited = false;
+
 /**
  * Root
  * nececcary classes
@@ -37,7 +39,9 @@ const App: React.FC = () => {
    * data
    */
   useEffect(() => {
-    if (gltf && gltf.scene) {
+    if (gltf && gltf.scene && !wasInited) {
+      wasInited = true
+      
       chessBoard.setScene(gltf.scene)
 
       if (chessBoard) {
