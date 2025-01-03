@@ -25,4 +25,7 @@ export interface IPiece {
   color: PieceColor;
   object: THREE.Group | THREE.Mesh | null;
   isEaten: boolean;
+  setCell: (params:string) => void
+  setIsSelected: (params:boolean) => void
+  eatPiece: () => void
 }

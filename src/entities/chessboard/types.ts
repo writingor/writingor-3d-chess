@@ -1,7 +1,7 @@
-import { Piece } from "../piece";
+import { IPiece } from "../piece";
 import * as THREE from "three";
 
-export interface PiecesInterface { black: { [key: string]: Piece }, white: { [key: string]: Piece } }
+export interface PiecesInterface { black: { [key: string]: IPiece }, white: { [key: string]: IPiece } }
 
 export interface CellInterface {
     [key: string]: {

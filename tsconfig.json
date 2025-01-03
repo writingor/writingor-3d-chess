@@ -6,7 +6,12 @@
       "@features/*": ["features/*"],
       "@entities/*": ["entities/*"],
       "@shared/*": ["shared/*"]
-    }
+    },
+    "esModuleInterop": true, // Enable esModuleInterop for CommonJS compatibility
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "jsx": "react", // Add this line for React JSX support
+    "strict": true
   },
   "include": ["src/**/*"]
 }
