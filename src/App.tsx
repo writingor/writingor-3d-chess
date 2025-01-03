@@ -41,12 +41,13 @@ const App: React.FC = () => {
   useEffect(() => {
     if (gltf && gltf.scene && !wasInited) {
       wasInited = true
-      
+
       chessBoard.setScene(gltf.scene)
 
       if (chessBoard) {
         game.setChessBoard(chessBoard)
         chessBoard.fillChessBoard(gltf.scene);
+        chessBoard.dispatchEventPiecesPlacedOnStart()
       }
 
       gltf.scene.rotation.set(0, 1.58, 0)

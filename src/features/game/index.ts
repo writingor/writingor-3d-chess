@@ -1,6 +1,10 @@
 import * as THREE from "three";
 import { ThreeEvent } from "@react-three/fiber";
 import { ChessBoard } from "../../entities/chessboard";
+import { Chess } from 'chess.js';
+import { Piece } from "../../entities/piece";
+
+const chess = new Chess();
 
 export class Game {
   chessBoard: ChessBoard | null;
@@ -11,6 +15,79 @@ export class Game {
 
   setChessBoard(chessBoard: ChessBoard) {
     this.chessBoard = chessBoard;
+    
+    window.addEventListener('PicesPlacedOnStart', () => {
+      if (!this.chessBoard) return
+      chess.load(this.chessBoard.getFEN())
+    })
+  }
+
+  // Function to get computer move using Stockfish API
+  async computerMove() {
+    const fen = chess.fen();
+    const move = await this.getBestMove(fen);
+
+    if (move) {
+      const from = move?.slice(0, 2),
+        to = move?.slice(-2)
+
+      const cell = this.chessBoard?.scene?.getObjectByName(to)
+      this.eatPiece(to)
+
+      console.log('COPM cell' ,cell)
+      
+      if (cell) {
+        const piece = this.chessBoard?.getPieceByCell(from)
+
+        console.log('COPM piece BEFORE moving' ,piece)
+      
+        piece?.object?.position.set(
+          cell.position.x,
+          cell.position.y,
+          cell.position.z
+        );
+
+        piece?.setCell(to)
+
+        console.log('COPM piece AFTER moving' ,piece)
+      }
+
+      chess.move({from, to});
+
+      console.log(chess.ascii())
+
+      if (chess.isGameOver()) {
+        console.log("Game over!");
+      }
+    }
+  }
+
+  async getBestMove(fen: string): Promise<string | null> {
+    const response = await fetch('http://ws.chess-api.online/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fen: fen,
+        depth: 10,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.bestMove
+    } else {
+      return null;
+    }
+  }
+
+  getAvailableMoves(piece: Piece) {
+    const moves = chess.moves({ verbose: true });
+  
+    const validMoves = moves.filter(move => move.from === piece.cell);
+    
+    return validMoves.map(move => move.to);
   }
 
   /**
@@ -23,54 +100,15 @@ export class Game {
    * The delay is set to 100ms to allow processing of the first object before resetting the
    * `isFirstObjectFound` flag.
    */
-  delayAfterMatch() {
+  delayAfterClick() {
     setTimeout(() => {
       this.chessBoard?.setIsFirstObjectFound(false);
     }, 100);
   }
 
-  /**
-   * HighLight cells
-   */
-  highlightCells() {
-    if (!this.chessBoard) return;
-
-    const selectedPiece = this.chessBoard.getSelectedPiece();
-
-    if (!selectedPiece) return;
-
-    const letters = ["a", "b", "c", "d", "e", "f", "g", "h"].reverse();
-    const numbers = [1, 2, 3, 4, 5, 6, 7, 8];
-
-    const letter = selectedPiece.cell.charAt(0),
-      num = parseInt(selectedPiece.cell.charAt(1));
-
-    // clear color
-    Object.values(this.chessBoard?.cells).forEach((cell) => {
-        cell.object.material.color.set(cell.initialColor);
-        cell.isAllowed = false
-      });
-
-    // highlite
-    Object.values(this.chessBoard?.cells).forEach((cell) => {
-      selectedPiece.dimensions.forEach((dim) => {
-        if (
-          cell.object.name.charAt(0) ===
-            letters[letters.indexOf(letter) + dim.x] &&
-          parseInt(cell.object.name.charAt(1)) ===
-            numbers[numbers.indexOf(num) + dim.y]
-        ) {
-
-          let pieceOnTargetCell = this.chessBoard.getPieceByCell(cell.name)
-          
-          // we play as white
-          if (!pieceOnTargetCell || pieceOnTargetCell.color === 'black') {
-            cell.object.material.color.set(0xff0000);
-            cell.isAllowed = true
-          }
-        }
-      });
-    });
+  highlightMoves() {
+    if (!this.chessBoard) return
+    this.chessBoard.highlightCells(this.getAvailableMoves(this.chessBoard.getSelectedPiece()))
   }
 
   /**
@@ -82,20 +120,29 @@ export class Game {
   selectPiece(object: THREE.Group | THREE.Mesh) {
     if (!this.chessBoard) return;
 
-    this.chessBoard.setIsFirstObjectFound(true);
-
     this.chessBoard.unselectPieces();
+
     const piece = this.chessBoard.getPieceByObject(object);
+    if (!piece || piece.color === 'black') return
 
-    if (piece) {
-      piece.setIsSelected(true);
-    }
-
+    this.chessBoard.setIsFirstObjectFound(true);
+    
+    piece.setIsSelected(true);
     this.chessBoard.setSelectedPieceUUID(object.uuid);
 
-    this.highlightCells();
+    this.highlightMoves();
+    this.delayAfterClick();
+  }
 
-    this.delayAfterMatch();
+  eatPiece(cellName: string) {
+    if (!this.chessBoard) return
+
+    const pieceOnCell = this.chessBoard.getPieceByCell(cellName)
+
+    if (pieceOnCell) {
+      pieceOnCell.eatPiece()
+      this.chessBoard.removePiece(pieceOnCell.object)
+    }
   }
 
   /**
@@ -104,7 +151,7 @@ export class Game {
    * @param object
    * @returns
    */
-  movePiece(object: THREE.Group | THREE.Mesh) {
+  async movePiece(object: THREE.Group | THREE.Mesh) {
     if (!this.chessBoard) return;
 
     let cell = this.chessBoard.cells[object.name]
@@ -114,42 +161,48 @@ export class Game {
     this.chessBoard.setIsFirstObjectFound(true);
 
     if (this.chessBoard.selectedPieceUUID) {
-      const figure = this.chessBoard.scene?.getObjectByProperty(
-        "uuid",
-        this.chessBoard.selectedPieceUUID
-      );
-
-      if (figure) {
-        figure.position.set(
-          object.position.x,
-          object.position.y,
-          object.position.z
-        );
-      }
 
       const piece = this.chessBoard.getPieceByUUID(
         this.chessBoard.selectedPieceUUID
       );
 
       if (piece) {
+        this.eatPiece(object.name)
+
+        chess.move({from: piece.cell, to: object.name});
+        
+        const figure = this.chessBoard.scene?.getObjectByProperty(
+          "uuid",
+          this.chessBoard.selectedPieceUUID
+        );
+
+        if (figure) {
+          figure.position.set(
+            object.position.x,
+            object.position.y,
+            object.position.z
+          );
+        }
+
+
         piece.setCell(object.name);
-        piece.setPosition({
-          x: object.position.x,
-          y: object.position.y,
-          z: object.position.z,
-        });
         piece.setIsSelected(false);
         this.chessBoard.setSelectedPieceUUID("");
 
-        // clear color
-        Object.values(this.chessBoard?.cells).forEach((cell) => {
-          cell.object.material.color.set(cell.initialColor);
-          cell.isAllowed = false
-        });
+        this.chessBoard.unselectCells()
+
+
+        console.log('USER MOVED THIS', piece)
+  
+        if (chess.isGameOver()) {
+          console.log("Game over!");
+        } else {
+          await this.computerMove();
+        }
       }
     }
 
-    this.delayAfterMatch();
+    this.delayAfterClick();
   }
 
   /**
@@ -161,6 +214,7 @@ export class Game {
    */
   play = (event: ThreeEvent<PointerEvent>) => {
     if (
+      chess.isGameOver() ||
       !this.chessBoard ||
       this.chessBoard.isFirstObjectFound ||
       !(
@@ -176,7 +230,5 @@ export class Game {
     } else if (event.object?.parent?.name === "Grid") {
       this.movePiece(event.object);
     }
-
-    console.log(this.chessBoard);
   };
 }

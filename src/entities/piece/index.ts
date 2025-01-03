@@ -20,179 +20,15 @@ const defaultPositions: { [key: string]: { [key: string]: string[] } } = {
   },
 };
 
-const piecesDimentions: { [key: string]: DimentionsType[] } = {
-  king: [
-    { x: 0, y: 1 },
-    { x: 0, y: -1 },
-    { x: 1, y: 0 },
-    { x: 1, y: -1 },
-    { x: 1, y: 1 },
-    { x: -1, y: 0 },
-    { x: -1, y: 1 },
-    { x: -1, y: -1 },
-  ],
-  queen: [
-    { x: 1, y: 0 },
-    { x: -1, y: 0 },
-    { x: 2, y: 0 },
-    { x: -2, y: 0 },
-    { x: 3, y: 0 },
-    { x: -3, y: 0 },
-    { x: 4, y: 0 },
-    { x: -4, y: 0 },
-    { x: 5, y: 0 },
-    { x: -5, y: 0 },
-    { x: 6, y: 0 },
-    { x: -6, y: 0 },
-    { x: 7, y: 0 },
-    { x: -7, y: 0 },
-
-    { x: 0, y: 1 },
-    { x: 0, y: -1 },
-    { x: 0, y: 2 },
-    { x: 0, y: -2 },
-    { x: 0, y: 3 },
-    { x: 0, y: -3 },
-    { x: 0, y: 4 },
-    { x: 0, y: -4 },
-    { x: 0, y: 5 },
-    { x: 0, y: -5 },
-    { x: 0, y: 6 },
-    { x: 0, y: -6 },
-    { x: 0, y: 7 },
-    { x: 0, y: -7 },
-
-    { x: 1, y: 1 },
-    { x: 1, y: -1 },
-    { x: -1, y: 1 },
-    { x: -1, y: -1 },
-
-    { x: 2, y: 2 },
-    { x: 2, y: -2 },
-    { x: -2, y: 2 },
-    { x: -2, y: -2 },
-    
-    { x: 3, y: 3 },
-    { x: 3, y: -3 },
-    { x: -3, y: 3 },
-    { x: -3, y: -3 },
-    
-    { x: 4, y: 4 },
-    { x: 4, y: -4 },
-    { x: -4, y: 4 },
-    { x: -4, y: -4 },
-    
-    { x: 5, y: 5 },
-    { x: 5, y: -5 },
-    { x: -5, y: 5 },
-    { x: -5, y: -5 },
-    
-    { x: 6, y: 6 },
-    { x: 6, y: -6 },
-    { x: -6, y: 6 },
-    { x: -6, y: -6 },
-    
-    { x: 7, y: 7 },
-    { x: 7, y: -7 },
-    { x: -7, y: 7 },
-    { x: -7, y: -7 },
-  ],
-  rook: [
-    { x: 1, y: 0 },
-    { x: -1, y: 0 },
-    { x: 2, y: 0 },
-    { x: -2, y: 0 },
-    { x: 3, y: 0 },
-    { x: -3, y: 0 },
-    { x: 4, y: 0 },
-    { x: -4, y: 0 },
-    { x: 5, y: 0 },
-    { x: -5, y: 0 },
-    { x: 6, y: 0 },
-    { x: -6, y: 0 },
-    { x: 7, y: 0 },
-    { x: -7, y: 0 },
-
-    { x: 0, y: 1 },
-    { x: 0, y: -1 },
-    { x: 0, y: 2 },
-    { x: 0, y: -2 },
-    { x: 0, y: 3 },
-    { x: 0, y: -3 },
-    { x: 0, y: 4 },
-    { x: 0, y: -4 },
-    { x: 0, y: 5 },
-    { x: 0, y: -5 },
-    { x: 0, y: 6 },
-    { x: 0, y: -6 },
-    { x: 0, y: 7 },
-    { x: 0, y: -7 },
-  ],
-  bishop: [
-    { x: 1, y: 1 },
-    { x: 1, y: -1 },
-    { x: -1, y: 1 },
-    { x: -1, y: -1 },
-
-    { x: 2, y: 2 },
-    { x: 2, y: -2 },
-    { x: -2, y: 2 },
-    { x: -2, y: -2 },
-    
-    { x: 3, y: 3 },
-    { x: 3, y: -3 },
-    { x: -3, y: 3 },
-    { x: -3, y: -3 },
-    
-    { x: 4, y: 4 },
-    { x: 4, y: -4 },
-    { x: -4, y: 4 },
-    { x: -4, y: -4 },
-    
-    { x: 5, y: 5 },
-    { x: 5, y: -5 },
-    { x: -5, y: 5 },
-    { x: -5, y: -5 },
-    
-    { x: 6, y: 6 },
-    { x: 6, y: -6 },
-    { x: -6, y: 6 },
-    { x: -6, y: -6 },
-    
-    { x: 7, y: 7 },
-    { x: 7, y: -7 },
-    { x: -7, y: 7 },
-    { x: -7, y: -7 },
-  ],
-  knight: [
-    { x: 1, y: 2 },
-    { x: 1, y: -2 },
-    { x: -1, y: 2 },
-    { x: -1, y: -2 },
-    { x: 2, y: 1 },
-    { x: 2, y: -1 },
-    { x: -2, y: 1 },
-    { x: -2, y: -1 },
-  ],
-  pawn: [
-    { x: 0, y: 1 },
-    { x: 0, y: 2 },
-    { x: -1, y: 1 },
-    { x: 1, y: 1 },
-  ],
-};
-
 export class Piece {
   type: string;
   name: string;
-  position: { x: number; y: number; z: number };
   cell: string;
   isSelected: boolean;
   color: string;
   weight: number;
   isEaten: boolean;
   object: THREE.Group | THREE.Mesh | null;
-  dimensions: DimentionsType[];
 
   constructor(
     type: string,
@@ -204,26 +40,15 @@ export class Piece {
     isSelected: boolean = false,
     isEaten: boolean = false,
     object: THREE.Group | THREE.Mesh | null = null,
-    dimensions: DimentionsType[] = piecesDimentions.pawn
   ) {
     this.type = type;
     this.name = name;
     this.cell = cell;
-    this.position = position;
     this.color = color;
     this.weight = weight;
     this.isSelected = isSelected;
     this.isEaten = isEaten;
     this.object = object;
-    this.dimensions = dimensions;
-  }
-
-  setPosition(position: { x: number; y: number; z: number }) {
-    this.position = position;
-  }
-
-  setDimentions(dimentions: DimentionsType[]) {
-    this.dimensions = dimentions;
   }
 
   setCell(cell: string) {
@@ -266,9 +91,7 @@ export class PieceFactory {
       type.charAt(0).toUpperCase() + type.slice(1)
     }${index}`;
 
-    let
-      weight = 0,
-      dimensions = piecesDimentions[type];
+    let weight = 0
 
     switch (type) {
       case "king":
@@ -303,7 +126,6 @@ export class PieceFactory {
       false,
       false,
       object,
-      dimensions
     );
   }
 }
