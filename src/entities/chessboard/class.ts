@@ -183,7 +183,7 @@ export class ChessBoard {
                 let cell = this.scene.getObjectByProperty('name', this.getPieceByObject(object)?.cell)
 
                 if (cell) {
-                    object.position.set(cell.position.x, cell.position.y, cell.position.z)
+                    object.position.set(cell.position.x, cell.position.y + 0.5, cell.position.z)
                 }
             }
         }, 200)
@@ -211,7 +211,7 @@ export class ChessBoard {
     selectCells(availableCells) {
         Object.values(this.cells).forEach((cell) => {
             if (availableCells.includes(cell.name)) {
-                cell.object.material.color.set(0xff0000)
+                cell.object.material.color.set('#7786b8')
                 cell.isAllowed = true
             }
         })
@@ -229,7 +229,6 @@ export class ChessBoard {
         if (!(object instanceof THREE.Mesh)) return
 
         if (object.isMesh && object.geometry) {
-            // Ensure the bounding box is computed
             object.geometry.computeBoundingBox()
             const boundingBox = object.geometry.boundingBox
             if (boundingBox) {
@@ -256,21 +255,37 @@ export class ChessBoard {
                         // Create a 3D square using THREE.BoxGeometry
                         const geometry = new THREE.BoxGeometry(squareSize, 0.1, squareSize)
                         const material = new THREE.MeshBasicMaterial({
-                            color: isBlack ? 'black' : 'white'
+                            color: isBlack ? '#4d382c' : '#f2ece6'
                         })
                         const square = new THREE.Mesh(geometry, material)
 
                         square.position.set(xPos, 0, zPos) // Set the position of each square
                         square.name = squareName
 
-                        object.add(square)
+                        object.add(square) // Add the square to the object
 
                         this.cells[square.name] = {
-                            initialColor: isBlack ? 'black' : 'white',
+                            initialColor: isBlack ? '#4d382c' : '#f2ece6',
                             object: square,
                             isAllowed: false,
                             name: square.name
                         }
+
+                        // Create the edges geometry and material for the border effect
+                        const edges = new THREE.EdgesGeometry(geometry)
+                        const edgesMaterial = new THREE.LineBasicMaterial({
+                            color: isBlack ? '#57433e' : '#d1b8b2',
+                            opacity: 0.1
+                        })
+                        const edgesMesh = new THREE.LineSegments(edges, edgesMaterial)
+
+                        edgesMesh.scale.set(0.85, 0.85, 0.85)
+
+                        // Position the edges exactly on top of the square (no need to scale)
+                        edgesMesh.position.set(xPos, 0.05, zPos) // Keep the position centered with the square
+
+                        // Add the edges (border) to the object
+                        object.add(edgesMesh)
                     }
                 }
             }

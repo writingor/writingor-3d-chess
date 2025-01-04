@@ -35,7 +35,7 @@ export class Piece implements IPiece {
     switchColor() {
         if (this.object && this.object instanceof THREE.Mesh) {
             const material = this.object.material as THREE.MeshBasicMaterial
-            material.color.set(this.isSelected ? 'gray' : this.color === PieceColor.BLACK ? 'black' : 'white')
+            material.color.set(this.isSelected ? '#8aa5ff' : this.color === PieceColor.BLACK ? 'black' : 'white')
         }
     }
 

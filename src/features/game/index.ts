@@ -37,7 +37,7 @@ export class Game {
             if (cell) {
                 const piece = this.chessBoard?.getPieceByCell(from)
 
-                piece?.object?.position.set(cell.position.x, cell.position.y, cell.position.z)
+                piece?.object?.position.set(cell.position.x, cell.position.y + 0.5, cell.position.z)
 
                 piece?.setCell(to)
             }
@@ -159,7 +159,7 @@ export class Game {
                 const figure = this.chessBoard.scene?.getObjectByProperty('uuid', this.chessBoard.selectedPieceUUID)
 
                 if (figure) {
-                    figure.position.set(object.position.x, object.position.y, object.position.z)
+                    figure.position.set(object.position.x, object.position.y + 0.5, object.position.z)
                 }
 
                 piece.setCell(object.name)
