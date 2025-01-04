@@ -94,16 +94,17 @@ export class Game {
      * @param cellName
      * @returns
      */
-    eatPiece(cellName: string) {
+    eatPiece(cellName: string, playedColor: PieceColor) {
         const piece = this.chessBoard.getPieceByCell(cellName)
-        if (!piece) return
 
-        piece.setIsEaten()
-        this.chessBoard.removePiece(piece.object as THREE.Mesh)
+        if (piece) {
+            piece.setIsEaten()
+            this.chessBoard.removePiece(piece.object as THREE.Mesh)
+        }
 
         this.earnedWeights.appendWeight(
-            piece.color === PieceColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
-            pieceWeights[piece.type]
+            playedColor === PieceColor.WHITE ? PlayerColor.WHITE : PlayerColor.BLACK,
+            piece ? pieceWeights[piece.type] : 0
         )
     }
 
@@ -116,7 +117,7 @@ export class Game {
     doNececcaryActionsOnMove(piece: IPiece, cell: THREE.Group | THREE.Mesh) {
         if (!piece.object) return
 
-        this.eatPiece(cell.name)
+        this.eatPiece(cell.name, piece.color)
         this.chess.move({ from: piece.cell, to: cell.name })
 
         gsap.to(piece.object.position, {

@@ -4,7 +4,7 @@ import { Canvas, ThreeEvent, useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { ChessBoard } from '@entities/chessboard'
 import { Game } from '@features/game'
-import EarnedWeightsWidget from '@widgets/chart/earnedWeights'
+import { EarnedWeightsWidget } from '@widgets/chart/earnedWeights'
 
 /**
  * App
