@@ -14,7 +14,12 @@ export const App: React.FC = () => {
     /**
      * Prepare neccary instances
      */
-    const gltf = useLoader(GLTFLoader, '/src/assets/objects/chess/board.glb')
+    const gltf = useLoader(
+        GLTFLoader,
+        import.meta.env.MODE === 'development'
+            ? '/src/assets/objects/chess/board.glb'
+            : '/writingor-3d-chess/assets/objects/chess/board.glb'
+    )
     const chessBoard = new ChessBoard(gltf.scene)
     const game = new Game(chessBoard)
 
