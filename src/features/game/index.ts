@@ -145,7 +145,9 @@ export class Game {
      * @returns
      */
     async fetchComputerMove(fen: string): Promise<string | null> {
-        const response = await fetch('http://ws.chess-api.online/', {
+        // https://chess-api.com/v1
+        // http://ws.chess-api.online/
+        const response = await fetch('https://chess-api.com/v1', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -158,7 +160,8 @@ export class Game {
 
         if (response.ok) {
             const data = await response.json()
-            return data.bestMove
+            // return data.bestMove // http://ws.chess-api.online/
+            return data // https://chess-api.com/v1
         }
 
         return null
@@ -173,8 +176,8 @@ export class Game {
         const move = await this.fetchComputerMove(fen)
         if (!move) return
 
-        const from = move?.slice(0, 2)
-        const to = move?.slice(-2)
+        const from = typeof move === 'string' ? move.slice(0, 2) : move.from
+        const to = typeof move === 'string' ? move.slice(-2) : move.to
 
         const cell = this.chessBoard.scene.getObjectByName(to)
         if (!cell) return
