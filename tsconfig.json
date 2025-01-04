@@ -8,6 +8,9 @@
             "@features/*": [
                 "features/*"
             ],
+            "@widgets/*": [
+                "widgets/*"
+            ],
             "@entities/*": [
                 "entities/*"
             ],
