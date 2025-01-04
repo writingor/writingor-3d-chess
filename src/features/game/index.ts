@@ -2,10 +2,15 @@ import * as THREE from 'three'
 import { ThreeEvent } from '@react-three/fiber'
 import { ChessBoard } from '@entities/chessboard'
 import { Chess } from 'chess.js'
-import { IPiece } from '@entities/piece/single/types'
+import { IPiece, PieceColor } from '@entities/piece/single/types'
 import { gsap } from 'gsap'
+import { EarnedWeights } from '@entities/chart/earnedWeights'
+import { PlayerColor } from '@entities/chart/earnedWeights/types'
+import { pieceWeights } from '@shared/configs/pieces/weights'
 
 const chess = new Chess()
+
+const earnedWeights = new EarnedWeights()
 
 export class Game {
     chessBoard: ChessBoard | null
@@ -139,6 +144,10 @@ export class Game {
         if (pieceOnCell) {
             pieceOnCell.eatPiece()
             this.chessBoard.removePiece(pieceOnCell.object)
+            earnedWeights.appendWeight(
+                pieceOnCell.color === PieceColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
+                pieceWeights[pieceOnCell.type]
+            )
         }
     }
 
