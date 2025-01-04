@@ -6,4 +6,5 @@
 
 canvas {
   display: block;
+  background: linear-gradient(188deg, #d39943, #966e87, #c2bbb8);
 }

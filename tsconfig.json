@@ -1,7 +1,29 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "@app/*": [
+                "app/*"
+            ],
+            "@features/*": [
+                "features/*"
+            ],
+            "@entities/*": [
+                "entities/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
+        },
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "jsx": "react-jsx",
+        "strict": true
+    },
+    "include": [
+        "src/**/*"
+    ]
 }
