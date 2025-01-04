@@ -3,6 +3,7 @@ import { ThreeEvent } from '@react-three/fiber'
 import { ChessBoard } from '@entities/chessboard'
 import { Chess } from 'chess.js'
 import { IPiece } from '@entities/piece/single/types'
+import { gsap } from 'gsap'
 
 const chess = new Chess()
 
@@ -37,7 +38,15 @@ export class Game {
             if (cell) {
                 const piece = this.chessBoard?.getPieceByCell(from)
 
-                piece?.object?.position.set(cell.position.x, cell.position.y + 0.5, cell.position.z)
+                if (piece?.object) {
+                    gsap.to(piece.object.position, {
+                        x: cell.position.x,
+                        y: cell.position.y + 0.5,
+                        z: cell.position.z,
+                        duration: 0.7,
+                        ease: 'power1.inOut'
+                    })
+                }
 
                 piece?.setCell(to)
             }
@@ -159,7 +168,13 @@ export class Game {
                 const figure = this.chessBoard.scene?.getObjectByProperty('uuid', this.chessBoard.selectedPieceUUID)
 
                 if (figure) {
-                    figure.position.set(object.position.x, object.position.y + 0.5, object.position.z)
+                    gsap.to(figure.position, {
+                        x: object.position.x,
+                        y: object.position.y + 0.5,
+                        z: object.position.z,
+                        duration: 0.7,
+                        ease: 'power1.inOut'
+                    })
                 }
 
                 piece.setCell(object.name)
