@@ -1,9 +1,10 @@
-import './App.css'
+import './styles.css'
 import React, { Suspense, useEffect } from 'react'
 import { Canvas, ThreeEvent, useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { ChessBoard } from './entities/chessboard'
-import { Game } from './features/game'
+import { ChessBoard } from '@entities/chessboard'
+import { Game } from '@features/game'
+import EarnedWeightsWidget from '@widgets/chart/earnedWeights'
 
 let wasInited = false
 
@@ -18,7 +19,7 @@ const game = new Game()
  * App
  * @returns React Component
  */
-const App: React.FC = () => {
+export const App: React.FC = () => {
     /**
      * Load 3D scene
      */
@@ -66,9 +67,8 @@ const App: React.FC = () => {
                     <directionalLight color={'#d6ffe9'} position={[15, 21, 10]} intensity={(Math.PI / 1.05) * 1} />
                     <primitive object={gltf.scene} position={[12, 0, 0]} onClick={handleClick} />
                 </Canvas>
+                <EarnedWeightsWidget />
             </Suspense>
         </div>
     )
 }
-
-export default App
