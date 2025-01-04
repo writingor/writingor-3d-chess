@@ -1,15 +1,28 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig(({ mode }) => {
     return {
-        plugins: [react()],
+        plugins: [
+            react(),
+            viteStaticCopy({
+                targets: [
+                    {
+                        src: 'src/assets/objects/chess/*.glb',
+                        dest: 'assets/objects/chess'
+                    }
+                ]
+            })
+        ],
         base: mode === 'development' ? './' : '/writingor-3d-chess/',
         build: {
-            outDir: 'docs'
+            outDir: 'docs',
+            rollupOptions: {
+                input: '/index.html'
+            }
         },
-        assetsInclude: ['**/*.glb'],
         resolve: {
             alias: {
                 '@app': path.resolve(__dirname, './src/app'),
