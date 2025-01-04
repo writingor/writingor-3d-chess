@@ -176,7 +176,9 @@ export class Game {
         const move = await this.fetchComputerMove(fen)
         if (!move) return
 
+        // @ts-ignore
         const from = typeof move === 'string' ? move.slice(0, 2) : move.from
+        // @ts-ignore
         const to = typeof move === 'string' ? move.slice(-2) : move.to
 
         const cell = this.chessBoard.scene.getObjectByName(to)
