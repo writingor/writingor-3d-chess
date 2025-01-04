@@ -27,5 +27,5 @@ export interface IPiece {
     isEaten: boolean
     setCell: (params: string) => void
     setIsSelected: (params: boolean) => void
-    eatPiece: () => void
+    setIsEaten: (param?: boolean) => void
 }

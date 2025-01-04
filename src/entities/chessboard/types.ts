@@ -6,7 +6,7 @@ export interface PiecesInterface {
     white: { [key: string]: IPiece }
 }
 
-export interface CellInterface {
+export interface ICell {
     [key: string]: {
         name: string
         initialColor: string

@@ -1,19 +1,10 @@
 import './styles.css'
-import React, { Suspense, useEffect } from 'react'
+import React, { Suspense } from 'react'
 import { Canvas, ThreeEvent, useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { ChessBoard } from '@entities/chessboard'
 import { Game } from '@features/game'
 import EarnedWeightsWidget from '@widgets/chart/earnedWeights'
-
-let wasInited = false
-
-/**
- * Root
- * nececcary classes
- */
-const chessBoard = new ChessBoard()
-const game = new Game()
 
 /**
  * App
@@ -21,39 +12,24 @@ const game = new Game()
  */
 export const App: React.FC = () => {
     /**
-     * Load 3D scene
+     * Prepare neccary instances
      */
     const gltf = useLoader(GLTFLoader, '/src/assets/objects/chess/board.glb')
+    const chessBoard = new ChessBoard(gltf.scene)
+    const game = new Game(chessBoard)
+
+    gltf.scene.rotation.set(0, 1.58, 0)
+
+    chessBoard.fillChessBoard(gltf.scene)
+    chessBoard.dispatchEventPiecesPlacedOnStart()
 
     /**
      * Move Piece on board
-     *
      * @param event ThreeJS Event Click
      */
     const handleClick = (event: ThreeEvent<PointerEvent>) => {
         game.play(event)
     }
-
-    /**
-     * Update
-     * Game and ChessBoard
-     * data
-     */
-    useEffect(() => {
-        if (gltf && gltf.scene && !wasInited) {
-            wasInited = true
-
-            chessBoard.setScene(gltf.scene)
-
-            if (chessBoard) {
-                game.setChessBoard(chessBoard)
-                chessBoard.fillChessBoard(gltf.scene)
-                chessBoard.dispatchEventPiecesPlacedOnStart()
-            }
-
-            gltf.scene.rotation.set(0, 1.58, 0)
-        }
-    }, [gltf])
 
     /**
      * Render APP Component
