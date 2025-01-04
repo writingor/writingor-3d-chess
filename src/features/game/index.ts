@@ -8,63 +8,142 @@ import { EarnedWeights } from '@entities/chart/earnedWeights'
 import { PlayerColor } from '@entities/chart/earnedWeights/types'
 import { pieceWeights } from '@shared/configs/pieces/weights'
 
-const chess = new Chess()
-
-const earnedWeights = new EarnedWeights()
-
 export class Game {
-    chessBoard: ChessBoard | null
+    chessBoard: ChessBoard
+    chess: Chess
+    earnedWeights: EarnedWeights
 
-    constructor(chessBoard: ChessBoard | null = null) {
+    constructor(chessBoard: ChessBoard) {
         this.chessBoard = chessBoard
+        this.chess = new Chess()
+        this.earnedWeights = new EarnedWeights()
     }
 
+    /**
+     *
+     * @param chessBoard
+     */
     setChessBoard(chessBoard: ChessBoard) {
         this.chessBoard = chessBoard
 
         window.addEventListener('PicesPlacedOnStart', () => {
             if (!this.chessBoard) return
-            chess.load(this.chessBoard.getFEN())
+            this.chess.load(this.chessBoard.getFEN())
         })
     }
 
-    // Function to get computer move using Stockfish API
-    async computerMove() {
-        const fen = chess.fen()
-        const move = await this.getBestMove(fen)
+    /**
+     * Delay to prevent simultaneous selection of multiple objects in Three.js click event.
+     *
+     * When clicking on objects in Three.js, if there's no delay, all objects in the vector
+     * might be selected at once. This delay helps ensure that the first object selection is
+     * processed before any further interactions can occur.
+     *
+     * The delay is set to 100ms to allow processing of the first object before resetting the
+     * `isFirst3DProcessing` flag.
+     */
+    delayAfterClick() {
+        setTimeout(() => {
+            this.chessBoard?.setIsFirst3DProcessing(false)
+        }, 100)
+    }
 
-        if (move) {
-            const from = move?.slice(0, 2),
-                to = move?.slice(-2)
+    /**
+     *
+     * @param piece
+     * @returns
+     */
+    getAvailableMoves(piece: IPiece): string[] {
+        const moves = this.chess.moves({ verbose: true })
+        const validMoves = moves.filter((move) => move.from === piece.cell)
 
-            const cell = this.chessBoard?.scene?.getObjectByName(to)
-            this.eatPiece(to)
+        return validMoves.map((move) => move.to)
+    }
 
-            if (cell) {
-                const piece = this.chessBoard?.getPieceByCell(from)
+    /**
+     *
+     * @returns
+     */
+    displayAvailableCells() {
+        this.chessBoard.highlightCells(this.getAvailableMoves(this.chessBoard.getSelectedPiece()))
+    }
 
-                if (piece?.object) {
-                    gsap.to(piece.object.position, {
-                        x: cell.position.x,
-                        y: cell.position.y + 0.5,
-                        z: cell.position.z,
-                        duration: 0.7,
-                        ease: 'power1.inOut'
-                    })
-                }
+    /**
+     * Select current Piece
+     *
+     * @param object
+     * @returns
+     */
+    selectPiece(object: THREE.Group | THREE.Mesh) {
+        this.chessBoard.unselectPieces()
 
-                piece?.setCell(to)
-            }
+        const piece = this.chessBoard.getPieceByObject(object)
+        if (!piece || piece.color === 'black') return
 
-            chess.move({ from, to })
+        this.chessBoard.setIsFirst3DProcessing(true)
 
-            if (chess.isGameOver()) {
-                console.log('Game over!')
-            }
+        piece.setIsSelected(true)
+        this.chessBoard.setSelectedPieceUUID(object.uuid)
+
+        this.displayAvailableCells()
+        this.delayAfterClick()
+    }
+
+    /**
+     *
+     * @param cellName
+     * @returns
+     */
+    eatPiece(cellName: string) {
+        const piece = this.chessBoard.getPieceByCell(cellName)
+        if (!piece) return
+
+        piece.setIsEaten()
+        this.chessBoard.removePiece(piece.object as THREE.Mesh)
+
+        this.earnedWeights.appendWeight(
+            piece.color === PieceColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
+            pieceWeights[piece.type]
+        )
+    }
+
+    /**
+     *
+     * @param piece
+     * @param cell
+     * @returns
+     */
+    doNececcaryActionsOnMove(piece: IPiece, cell: THREE.Group | THREE.Mesh) {
+        if (!piece.object) return
+
+        this.eatPiece(cell.name)
+        this.chess.move({ from: piece.cell, to: cell.name })
+
+        gsap.to(piece.object.position, {
+            x: cell.position.x,
+            y: cell.position.y + 0.5,
+            z: cell.position.z,
+            duration: 0.5,
+            ease: 'power1.inOut'
+        })
+
+        piece.setIsSelected(false)
+        piece.setCell(cell.name)
+
+        this.chessBoard.setSelectedPieceUUID('')
+        this.chessBoard.unselectCells()
+
+        if (this.chess.isGameOver()) {
+            console.log('Game over!')
         }
     }
 
-    async getBestMove(fen: string): Promise<string | null> {
+    /**
+     *
+     * @param fen
+     * @returns
+     */
+    async fetchComputerMove(fen: string): Promise<string | null> {
         const response = await fetch('http://ws.chess-api.online/', {
             method: 'POST',
             headers: {
@@ -79,76 +158,30 @@ export class Game {
         if (response.ok) {
             const data = await response.json()
             return data.bestMove
-        } else {
-            return null
         }
-    }
 
-    getAvailableMoves(piece: IPiece) {
-        const moves = chess.moves({ verbose: true })
-
-        const validMoves = moves.filter((move) => move.from === piece.cell)
-
-        return validMoves.map((move) => move.to)
+        return null
     }
 
     /**
-     * Delay to prevent simultaneous selection of multiple objects in Three.js click event.
      *
-     * When clicking on objects in Three.js, if there's no delay, all objects in the vector
-     * might be selected at once. This delay helps ensure that the first object selection is
-     * processed before any further interactions can occur.
-     *
-     * The delay is set to 100ms to allow processing of the first object before resetting the
-     * `isFirstObjectFound` flag.
-     */
-    delayAfterClick() {
-        setTimeout(() => {
-            this.chessBoard?.setIsFirstObjectFound(false)
-        }, 100)
-    }
-
-    highlightMoves() {
-        if (!this.chessBoard) return
-        this.chessBoard.highlightCells(this.getAvailableMoves(this.chessBoard.getSelectedPiece()))
-    }
-
-    /**
-     * Select current Piece
-     *
-     * @param object
      * @returns
      */
-    selectPiece(object: THREE.Group | THREE.Mesh) {
-        if (!this.chessBoard) return
+    async computerMove() {
+        const fen = this.chess.fen()
+        const move = await this.fetchComputerMove(fen)
+        if (!move) return
 
-        this.chessBoard.unselectPieces()
+        const from = move?.slice(0, 2)
+        const to = move?.slice(-2)
 
-        const piece = this.chessBoard.getPieceByObject(object)
-        if (!piece || piece.color === 'black') return
+        const cell = this.chessBoard.scene.getObjectByName(to)
+        if (!cell) return
 
-        this.chessBoard.setIsFirstObjectFound(true)
+        const piece = this.chessBoard?.getPieceByCell(from)
+        if (!piece || !piece.object) return
 
-        piece.setIsSelected(true)
-        this.chessBoard.setSelectedPieceUUID(object.uuid)
-
-        this.highlightMoves()
-        this.delayAfterClick()
-    }
-
-    eatPiece(cellName: string) {
-        if (!this.chessBoard) return
-
-        const pieceOnCell = this.chessBoard.getPieceByCell(cellName)
-
-        if (pieceOnCell) {
-            pieceOnCell.eatPiece()
-            this.chessBoard.removePiece(pieceOnCell.object)
-            earnedWeights.appendWeight(
-                pieceOnCell.color === PieceColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
-                pieceWeights[pieceOnCell.type]
-            )
-        }
+        this.doNececcaryActionsOnMove(piece, cell as THREE.Mesh)
     }
 
     /**
@@ -157,47 +190,21 @@ export class Game {
      * @param object
      * @returns
      */
-    async movePiece(object: THREE.Group | THREE.Mesh) {
-        if (!this.chessBoard) return
+    async movePiece(cellOnCanvas: THREE.Group | THREE.Mesh) {
+        if (!this.chessBoard.selectedPieceUUID) return
 
-        let cell = this.chessBoard.cells[object.name]
+        const piece = this.chessBoard.getPieceByUUID(this.chessBoard.selectedPieceUUID)
+        if (!piece) return
 
-        if (!this.chessBoard.cells[object.name] || !cell.isAllowed) return
+        const cell = this.chessBoard.cells[cellOnCanvas.name]
+        if (!cell || !cell.object || !cell.isAllowed) return
 
-        this.chessBoard.setIsFirstObjectFound(true)
+        this.chessBoard.setIsFirst3DProcessing(true)
 
-        if (this.chessBoard.selectedPieceUUID) {
-            const piece = this.chessBoard.getPieceByUUID(this.chessBoard.selectedPieceUUID)
+        this.doNececcaryActionsOnMove(piece, cell.object)
 
-            if (piece) {
-                this.eatPiece(object.name)
-
-                chess.move({ from: piece.cell, to: object.name })
-
-                const figure = this.chessBoard.scene?.getObjectByProperty('uuid', this.chessBoard.selectedPieceUUID)
-
-                if (figure) {
-                    gsap.to(figure.position, {
-                        x: object.position.x,
-                        y: object.position.y + 0.5,
-                        z: object.position.z,
-                        duration: 0.7,
-                        ease: 'power1.inOut'
-                    })
-                }
-
-                piece.setCell(object.name)
-                piece.setIsSelected(false)
-                this.chessBoard.setSelectedPieceUUID('')
-
-                this.chessBoard.unselectCells()
-
-                if (chess.isGameOver()) {
-                    console.log('Game over!')
-                } else {
-                    await this.computerMove()
-                }
-            }
+        if (!this.chess.isGameOver()) {
+            await this.computerMove()
         }
 
         this.delayAfterClick()
@@ -212,17 +219,19 @@ export class Game {
      */
     play = (event: ThreeEvent<PointerEvent>) => {
         if (
-            chess.isGameOver() ||
-            !this.chessBoard ||
-            this.chessBoard.isFirstObjectFound ||
+            this.chess.isGameOver() ||
+            this.chessBoard.getIsFirst3DProcessing() ||
             !(event.object instanceof THREE.Mesh || event.object instanceof THREE.Group)
         ) {
             return
         }
 
         if (this.chessBoard.getPieceByObject(event.object)) {
+            // if a piece was clicked
             this.selectPiece(event.object)
+            //
         } else if (event.object?.parent?.name === 'Grid') {
+            // else if a cell was clicked
             this.movePiece(event.object)
         }
     }

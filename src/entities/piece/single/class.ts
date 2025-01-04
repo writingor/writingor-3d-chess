@@ -44,7 +44,7 @@ export class Piece implements IPiece {
         this.switchColor()
     }
 
-    eatPiece() {
-        this.isEaten = true
+    setIsEaten(value: boolean = true) {
+        this.isEaten = value
     }
 }

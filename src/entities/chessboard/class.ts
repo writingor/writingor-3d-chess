@@ -1,29 +1,40 @@
 import * as THREE from 'three'
-import { CellInterface, PiecesInterface } from './types'
+import { ICell, PiecesInterface } from './types'
 import { IPiece } from '@entities/piece/single/types'
 import { defaultPieces } from './configs'
 import { PiecesAbstractFactory } from '@entities/piece/abstractFactory/class'
 import { IPiecesAbstractFactory } from '@entities/piece/abstractFactory/types'
 
+/**
+ * Contenxt to Manage
+ * Pieces and Cells
+ */
 export class ChessBoard {
-    scene: THREE.Group | null = null
-    cells: CellInterface = {}
-    pieces: PiecesInterface = defaultPieces
-    selectedPieceUUID: string = ''
-    isFirstObjectFound: boolean = false
-    piecesPlacedEvent: Event = new CustomEvent('PicesPlacedOnStart')
-    fenMap: { [key: string]: string } = {
-        king: 'K',
-        queen: 'Q',
-        rook: 'R',
-        bishop: 'B',
-        knight: 'N',
-        pawn: 'P'
-    }
+    scene: THREE.Group
+    cells: ICell
+    pieces: PiecesInterface
+    selectedPieceUUID: string
+    private isFirst3DProcessing: boolean
+    piecesPlacedEvent: Event
+    fenMap: { [key: string]: string }
     piecesAbstractFactory: IPiecesAbstractFactory
 
-    constructor() {
+    constructor(scene: THREE.Group | null = null) {
+        this.scene = scene as THREE.Group
+        this.cells = {}
+        this.pieces = defaultPieces
+        this.isFirst3DProcessing = false
         this.piecesAbstractFactory = new PiecesAbstractFactory()
+        this.selectedPieceUUID = ''
+        this.piecesPlacedEvent = new CustomEvent('PicesPlacedOnStart')
+        this.fenMap = {
+            king: 'K',
+            queen: 'Q',
+            rook: 'R',
+            bishop: 'B',
+            knight: 'N',
+            pawn: 'P'
+        }
     }
 
     dispatchEventPiecesPlacedOnStart() {
@@ -79,12 +90,12 @@ export class ChessBoard {
         return `${fenString} w KQkq - 0 1`
     }
 
-    setScene = (scene: THREE.Group | null) => {
-        this.scene = scene
+    setIsFirst3DProcessing = (isFirst3DProcessing: boolean) => {
+        this.isFirst3DProcessing = isFirst3DProcessing
     }
 
-    setIsFirstObjectFound = (isFirstObjectFound: boolean) => {
-        this.isFirstObjectFound = isFirstObjectFound
+    getIsFirst3DProcessing() {
+        return this.isFirst3DProcessing
     }
 
     setSelectedPieceUUID = (selectedPieceUUID: string) => {
@@ -129,7 +140,7 @@ export class ChessBoard {
         return found
     }
 
-    removePiece(objectToRemove) {
+    removePiece(objectToRemove: THREE.Mesh | THREE.Group) {
         if (objectToRemove.parent) {
             objectToRemove.parent.remove(objectToRemove)
         } else {
@@ -153,7 +164,7 @@ export class ChessBoard {
             if (found) break
         }
 
-        return found
+        return found as IPiece
     }
 
     getPieceByObject = (object: THREE.Group | THREE.Mesh) => {
@@ -202,16 +213,42 @@ export class ChessBoard {
     }
 
     unselectCells() {
-        Object.values(this?.cells).forEach((cell) => {
-            cell.object.material.color.set(cell.initialColor)
+        Object.values(this.cells).forEach((cell) => {
+            const material = cell.object.material
+
+            if (Array.isArray(material)) {
+                material.forEach((m) => {
+                    if (m && 'color' in m && m.color instanceof THREE.Color) {
+                        ;(m.color as THREE.Color).set(cell.initialColor)
+                    }
+                })
+            } else {
+                if (material && 'color' in material && material.color instanceof THREE.Color) {
+                    ;(material.color as THREE.Color).set(cell.initialColor)
+                }
+            }
+
             cell.isAllowed = false
         })
     }
 
-    selectCells(availableCells) {
+    selectCells(availableCells: string[]) {
         Object.values(this.cells).forEach((cell) => {
             if (availableCells.includes(cell.name)) {
-                cell.object.material.color.set('#7786b8')
+                const material = cell.object.material
+
+                if (Array.isArray(material)) {
+                    material.forEach((m) => {
+                        if (m && 'color' in m && m.color instanceof THREE.Color) {
+                            ;(m.color as THREE.Color).set('#7786b8')
+                        }
+                    })
+                } else {
+                    if (material && 'color' in material && material.color instanceof THREE.Color) {
+                        ;(material.color as THREE.Color).set('#7786b8')
+                    }
+                }
+
                 cell.isAllowed = true
             }
         })
@@ -220,7 +257,7 @@ export class ChessBoard {
     /**
      * HighLight cells
      */
-    highlightCells(availableMoves) {
+    highlightCells(availableMoves: string[]) {
         this.unselectCells()
         this.selectCells(availableMoves)
     }
