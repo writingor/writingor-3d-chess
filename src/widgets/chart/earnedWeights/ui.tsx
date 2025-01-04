@@ -12,6 +12,7 @@ import {
     Legend
 } from 'chart.js'
 import { PlayerColor } from '@entities/chart/earnedWeights/types'
+import { INewWeightEventDetail } from './types'
 
 // Register necessary Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
@@ -27,10 +28,9 @@ export const EarnedWeightsWidget: React.FC = () => {
             return accumulator + currentValue
         }, 0)
     }
-
     useEffect(() => {
         if (!isInited) {
-            const handleNewWeightEarned = (event: CustomEvent) => {
+            const handleNewWeightEarned = (event: CustomEvent<INewWeightEventDetail>) => {
                 const { color, weight } = event.detail
 
                 switch (color) {
@@ -45,11 +45,11 @@ export const EarnedWeightsWidget: React.FC = () => {
                 }
             }
 
-            window.addEventListener('NewWeightEarned', handleNewWeightEarned)
+            window.addEventListener('NewWeightEarned', handleNewWeightEarned as EventListener)
 
             // Cleanup the event listener when component unmounts
             return () => {
-                window.removeEventListener('NewWeightEarned', handleNewWeightEarned)
+                window.removeEventListener('NewWeightEarned', handleNewWeightEarned as EventListener)
             }
         }
 
