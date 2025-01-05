@@ -1,4 +1,4 @@
-import { PlayerColor } from '@shared/types/player/color'
+import { PlayerColor } from '@shared/configs/player/color'
 
 export interface IPlayer {
     setColor: (value: PlayerColor) => void
@@ -6,4 +6,8 @@ export interface IPlayer {
 
     setIsPlaying: (value: boolean) => void
     getIsPlaying: () => boolean
+
+    addEarnedWeight: (value: number) => void
+    getEarnedWeights: () => number[]
+    getEarnedNewWeightEvent: () => CustomEvent
 }

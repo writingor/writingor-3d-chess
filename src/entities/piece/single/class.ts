@@ -1,12 +1,13 @@
 import * as THREE from 'three'
-import { IPiece, PieceColor, PieceType } from './types'
+import { IPiece, PieceType } from './types'
+import { PlayerColor } from '@shared/configs/player/color'
 
 export class Piece implements IPiece {
     type: PieceType
     name: string
     cell: string
     isSelected: boolean
-    color: PieceColor
+    color: PlayerColor
     isEaten: boolean
     object: THREE.Group | THREE.Mesh
 
@@ -14,7 +15,7 @@ export class Piece implements IPiece {
         type: PieceType,
         name: string,
         cell: string,
-        color: PieceColor,
+        color: PlayerColor,
         object: THREE.Group | THREE.Mesh,
         isSelected: boolean = false,
         isEaten: boolean = false
@@ -35,7 +36,7 @@ export class Piece implements IPiece {
     switchColor() {
         if (this.object && this.object instanceof THREE.Mesh) {
             const material = this.object.material as THREE.MeshBasicMaterial
-            material.color.set(this.isSelected ? '#8aa5ff' : this.color === PieceColor.BLACK ? 'black' : 'white')
+            material.color.set(this.isSelected ? '#8aa5ff' : this.color)
         }
     }
 

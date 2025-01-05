@@ -1,13 +1,19 @@
-import { PlayerColor } from '@shared/types/player/color'
+import { PlayerColor } from '@shared/configs/player/color'
 import { IPlayer } from './types'
+
+const event = new CustomEvent('PlayerEarnedNewWeight')
 
 export class Player implements IPlayer {
     private color: PlayerColor
     private isPlaying: boolean
+    private earnedWeights: number[]
+    private earnedNewWeightEvent: CustomEvent
 
-    constructor(color: PlayerColor) {
+    constructor(color: PlayerColor, isPlaying: boolean = false) {
         this.color = color
-        this.isPlaying = false
+        this.isPlaying = isPlaying
+        this.earnedWeights = []
+        this.earnedNewWeightEvent = event
     }
 
     setColor(color: PlayerColor): void {
@@ -24,5 +30,18 @@ export class Player implements IPlayer {
 
     getIsPlaying(): boolean {
         return this.isPlaying
+    }
+
+    addEarnedWeight(earnedWeight: number) {
+        this.earnedWeights.push(earnedWeight)
+        window.dispatchEvent(this.getEarnedNewWeightEvent())
+    }
+
+    getEarnedNewWeightEvent(): CustomEvent {
+        return this.earnedNewWeightEvent
+    }
+
+    getEarnedWeights(): number[] {
+        return this.earnedWeights
     }
 }
