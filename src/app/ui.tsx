@@ -11,8 +11,8 @@ export const App: React.FC = () => {
      * Necessary instances
      */
     const isDev = import.meta.env.MODE === 'development'
-    const gltfPath = '/src/assets/objects/chess/board.glb'
-    const gltf = useLoader(GLTFLoader, isDev ? gltfPath : `/writingor-3d-chess${gltfPath}`)
+    const gltfPath = '/assets/objects/chess/board.glb'
+    const gltf = useLoader(GLTFLoader, isDev ? `/src${gltfPath}` : `/writingor-3d-chess${gltfPath}`)
     const game = new Game(new ChessBoard(gltf.scene))
 
     game.init()
