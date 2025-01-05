@@ -1,5 +1,5 @@
 import './styles.css'
-import React, { Suspense, useEffect, useState } from 'react'
+import React, { Suspense } from 'react'
 import { Canvas, ThreeEvent, useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { ChessBoard } from '@entities/chessboard'
