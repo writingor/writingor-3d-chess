@@ -37,6 +37,12 @@ export class ChessBoard {
         }
     }
 
+    init() {
+        this.scene.rotation.set(0, 1.58, 0)
+        this.fillChessBoard(this.scene)
+        this.dispatchEventPiecesPlacedOnStart()
+    }
+
     dispatchEventPiecesPlacedOnStart() {
         window.dispatchEvent(this.piecesPlacedEvent)
     }

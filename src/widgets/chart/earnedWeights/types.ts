@@ -1,6 +1,5 @@
-import { PlayerColor } from '@entities/chart/earnedWeights/types'
+import { Players } from '@features/game/types'
 
-export interface INewWeightEventDetail {
-    weight: number
-    color: PlayerColor
+export type EarnedWeightsWidgetProps = {
+    players: Players
 }

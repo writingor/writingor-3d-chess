@@ -6,39 +6,21 @@ import { ChessBoard } from '@entities/chessboard'
 import { Game } from '@features/game'
 import { EarnedWeightsWidget } from '@widgets/chart/earnedWeights'
 
-/**
- * App
- * @returns React Component
- */
 export const App: React.FC = () => {
     /**
-     * Prepare neccary instances
+     * Necessary instances
      */
-    const gltf = useLoader(
-        GLTFLoader,
-        import.meta.env.MODE === 'development'
-            ? '/src/assets/objects/chess/board.glb'
-            : '/writingor-3d-chess/assets/objects/chess/board.glb'
-    )
-    const chessBoard = new ChessBoard(gltf.scene)
-    const game = new Game(chessBoard)
+    const isDev = import.meta.env.MODE === 'development'
+    const gltfPath = '/src/assets/objects/chess/board.glb'
+    const gltf = useLoader(GLTFLoader, isDev ? gltfPath : `/writingor-3d-chess${gltfPath}`)
+    const game = new Game(new ChessBoard(gltf.scene))
 
-    gltf.scene.rotation.set(0, 1.58, 0)
+    game.init()
 
-    chessBoard.fillChessBoard(gltf.scene)
-    chessBoard.dispatchEventPiecesPlacedOnStart()
-
-    /**
-     * Move Piece on board
-     * @param event ThreeJS Event Click
-     */
-    const handleClick = (event: ThreeEvent<PointerEvent>) => {
+    function playGame(event: ThreeEvent<PointerEvent>) {
         game.play(event)
     }
 
-    /**
-     * Render APP Component
-     */
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
             <Suspense>
@@ -46,9 +28,9 @@ export const App: React.FC = () => {
                     <directionalLight color={'#f2ffff'} position={[-1, 7, 3]} intensity={(Math.PI / 1.5) * 1} />
                     <directionalLight color={'#ff8f9a'} position={[5, -10, -13]} intensity={(Math.PI / 1.25) * 1} />
                     <directionalLight color={'#d6ffe9'} position={[15, 21, 10]} intensity={(Math.PI / 1.05) * 1} />
-                    <primitive object={gltf.scene} position={[12, 0, 0]} onClick={handleClick} />
+                    <primitive object={gltf.scene} position={[12, 0, 0]} onClick={playGame} />
                 </Canvas>
-                <EarnedWeightsWidget />
+                <EarnedWeightsWidget players={game.getPlayers()} />
             </Suspense>
         </div>
     )
