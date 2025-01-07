@@ -2,14 +2,20 @@ import { PieceType } from '@shared/configs/pieces/types'
 import { PlayerColor } from '@shared/configs/player/color'
 import * as THREE from 'three'
 
-export interface IPiece {
-    type: PieceType
+export type TPieceProps = {
     name: string
     cell: string
-    isSelected: boolean
     color: PlayerColor
-    object: THREE.Group | THREE.Mesh | null
-    isEaten: boolean
+    object: THREE.Group | THREE.Mesh
+    isSelected?: boolean
+    isEaten?: boolean
+}
+
+export type TPiece = TPieceProps & {
+    type: PieceType
+}
+
+export interface IPiece extends TPiece {
     setCell: (params: string) => void
     setIsSelected: (params: boolean) => void
     setIsEaten: (param?: boolean) => void

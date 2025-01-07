@@ -1,1 +1,7 @@
 export * from './base'
+export * from './pawn'
+export * from './bishop'
+export * from './knight'
+export * from './rook'
+export * from './king'
+export * from './queen'

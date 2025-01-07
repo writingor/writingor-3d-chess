@@ -1,13 +1,13 @@
 import * as THREE from 'three'
 import { PieceFactory } from '../factory'
-import { IPiece } from '../single'
+import { Piece } from '../single'
 import { IPiecesAbstractFactory } from './types'
 import { PlayerColor } from '@shared/configs/player/color'
 import { PieceType } from '@shared/configs/pieces/types'
 
 export class PiecesAbstractFactory implements IPiecesAbstractFactory {
-    createPieceFrom3dObject(object: THREE.Group | THREE.Mesh): IPiece {
-        let piece: IPiece | null = null
+    createPieceFrom3dObject(object: THREE.Group | THREE.Mesh): Piece {
+        let piece: Piece | null = null
 
         switch (object.name) {
             /**
@@ -148,6 +148,6 @@ export class PiecesAbstractFactory implements IPiecesAbstractFactory {
                 break
         }
 
-        return piece as IPiece
+        return piece as Piece
     }
 }

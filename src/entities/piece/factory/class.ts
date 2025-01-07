@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { Piece } from '../single'
+import { Bishop, King, Knight, Pawn, Piece, Queen, Rook } from '../single'
 import { initialCells } from '@shared/configs/pieces/initialCells'
 import { PlayerColor } from '@shared/configs/player/color'
 import { PieceType } from '@shared/configs/pieces/types'
@@ -13,16 +13,35 @@ export class PieceFactory {
         color: PlayerColor = PlayerColor.WHITE
     ): Piece {
         let name = createPieceName(color, type, index)
-        let cell = initialCells[color][type]
+        let cell = initialCells[color][type][index - 1]
+        let piece: Piece
 
         switch (type) {
             case PieceType.KING:
+                piece = new King({ name, cell, color, object })
+                break
+
+            case PieceType.QUEEN:
+                piece = new Queen({ name, cell, color, object })
+                break
+
+            case PieceType.ROOK:
+                piece = new Rook({ name, cell, color, object })
+                break
+
+            case PieceType.BISHOP:
+                piece = new Bishop({ name, cell, color, object })
+                break
+
+            case PieceType.KNIGHT:
+                piece = new Knight({ name, cell, color, object })
                 break
 
             default:
+                piece = new Pawn({ name, cell, color, object })
                 break
         }
 
-        return new Piece(type, name, cell[index - 1], color, object, false, false)
+        return piece
     }
 }
