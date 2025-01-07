@@ -1,4 +1,4 @@
-import { InitialCellsType } from './types'
+import { InitialCellsType } from '@shared/types/piece'
 
 export const initialCells: InitialCellsType = {
     white: {

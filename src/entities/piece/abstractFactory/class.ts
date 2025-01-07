@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 import { PieceFactory } from '../factory'
-import { IPiece, PieceType } from '../single'
+import { IPiece } from '../single'
 import { IPiecesAbstractFactory } from './types'
 import { PlayerColor } from '@shared/configs/player/color'
+import { PieceType } from '@shared/configs/pieces/types'
 
 export class PiecesAbstractFactory implements IPiecesAbstractFactory {
     createPieceFrom3dObject(object: THREE.Group | THREE.Mesh): IPiece {
