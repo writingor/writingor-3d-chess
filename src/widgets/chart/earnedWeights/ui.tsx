@@ -11,52 +11,29 @@ import {
     Tooltip,
     Legend
 } from 'chart.js'
-import { PlayerColor } from '@entities/chart/earnedWeights/types'
+import { EarnedWeightsWidgetProps } from './types'
 
-// Register necessary Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 let isInited = false
 
-export const EarnedWeightsWidget: React.FC = () => {
-    const [whiteWeights, setWhiteWeights] = useState<number[]>([])
-    const [blackWeights, setBlackWeights] = useState<number[]>([])
+export const EarnedWeightsWidget: React.FC<EarnedWeightsWidgetProps> = ({ players, ...props }) => {
+    const [_, setTriggerReRender] = useState<number>(0)
 
-    const sumWeights = (numbers: number[]): number => {
-        return numbers.reduce((accumulator, currentValue) => {
-            return accumulator + currentValue
-        }, 0)
+    const whiteWeights = players.white.getEarnedWeights()
+    const blackWeights = players.black.getEarnedWeights()
+
+    function handlePlayerEarnedNewWeightEvent() {
+        setTriggerReRender(Math.random())
     }
 
     useEffect(() => {
         if (!isInited) {
-            const handleNewWeightEarned = (event: CustomEvent) => {
-                const { color, weight } = event.detail
-
-                switch (color) {
-                    case PlayerColor.BLACK:
-                        setBlackWeights((prevWeights) => [...prevWeights, sumWeights([...prevWeights, weight])])
-                        break
-                    case PlayerColor.WHITE:
-                        setWhiteWeights((prevWeights) => [...prevWeights, sumWeights([...prevWeights, weight])])
-                        break
-                    default:
-                        break
-                }
-            }
-
-            window.addEventListener('NewWeightEarned', handleNewWeightEarned)
-
-            // Cleanup the event listener when component unmounts
-            return () => {
-                window.removeEventListener('NewWeightEarned', handleNewWeightEarned)
-            }
+            isInited = true
+            window.addEventListener(players.black.getEarnedNewWeightEvent().type, handlePlayerEarnedNewWeightEvent)
         }
-
-        isInited = true
     }, [])
 
-    // Create the chart data structure
     const data = {
         labels: Array(Math.max(whiteWeights.length, blackWeights.length)).fill(''),
         datasets: [
@@ -65,7 +42,6 @@ export const EarnedWeightsWidget: React.FC = () => {
                 data: whiteWeights,
                 borderColor: '#f2ece6',
                 backgroundColor: 'transparent',
-                fill: true,
                 tension: 0.4
             },
             {
@@ -73,13 +49,11 @@ export const EarnedWeightsWidget: React.FC = () => {
                 data: blackWeights,
                 borderColor: '#4d382c',
                 backgroundColor: 'transparent',
-                fill: true,
                 tension: 0.4
             }
         ]
     }
 
-    // Chart options
     const options = {
         responsive: true,
         plugins: {
