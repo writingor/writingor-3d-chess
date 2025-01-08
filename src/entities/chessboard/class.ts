@@ -1,9 +1,10 @@
 import * as THREE from 'three'
 import { ICell, PiecesInterface } from './types'
-import { IPiece } from '@entities/piece/single/types'
 import { defaultPieces } from './configs'
 import { PiecesAbstractFactory } from '@entities/piece/abstractFactory/class'
 import { IPiecesAbstractFactory } from '@entities/piece/abstractFactory/types'
+import { TCellName } from '@shared/types/cell'
+import { IPiece } from '@entities/piece'
 
 /**
  * Contenxt to Manage
@@ -333,6 +334,20 @@ export class ChessBoard {
                 }
             }
         }
+    }
+
+    getCellNameForRookInCastling(kingsCellName: TCellName): TCellName {
+        const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+        return `${files.indexOf(kingsCellName[0]) < 4 ? 'd' : 'f'}${kingsCellName[1]}`
+    }
+
+    getClosestBorderCellNameInRow(cellName: TCellName): TCellName {
+        const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+        return `${files.indexOf(cellName[0]) < 4 ? 'a' : 'h'}${cellName[1]}`
+    }
+
+    getRookForCastling(cellName: TCellName): IPiece | null {
+        return this.getPieceByCell(this.getClosestBorderCellNameInRow(cellName))
     }
 
     /**
