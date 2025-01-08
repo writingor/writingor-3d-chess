@@ -169,8 +169,6 @@ export class Game {
      * @returns
      */
     async computerMove() {
-        console.log(this.chess.fen())
-
         const move = await this.fetchComputerMove(this.chess.fen())
         if (!move) return
 
@@ -222,8 +220,6 @@ export class Game {
             await this.computerMove()
             this.currentColor = PlayerColor.WHITE
         }
-
-        console.log(this.chess.ascii())
     }
 
     /**
