@@ -4,7 +4,7 @@ import { defaultPieces } from './configs'
 import { PiecesAbstractFactory } from '@entities/piece/abstractFactory/class'
 import { IPiecesAbstractFactory } from '@entities/piece/abstractFactory/types'
 import { TCellName } from '@shared/types/cell'
-import { IPiece } from '@entities/piece'
+import { IKing, IPiece, IRook } from '@entities/piece'
 
 /**
  * Contenxt to Manage
@@ -110,7 +110,7 @@ export class ChessBoard {
     }
 
     getPieceByUUID = (uuid: string) => {
-        let found: IPiece | null = null
+        let found: IPiece | IKing | IRook | null = null
 
         for (let color of ['white', 'black'] as ('white' | 'black')[]) {
             for (let pieceKey in this.pieces[color]) {
