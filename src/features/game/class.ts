@@ -204,6 +204,7 @@ export class Game {
         const isCastling: boolean =
             piece?.type === PieceType.KING &&
             piece.cell === 'e1' &&
+            piece instanceof King &&
             !piece.getIsMoved() &&
             (cellName === 'c1' || cellName === 'g1')
 
