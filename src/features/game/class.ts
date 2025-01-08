@@ -2,18 +2,20 @@ import * as THREE from 'three'
 import { ThreeEvent } from '@react-three/fiber'
 import { ChessBoard } from '@entities/chessboard'
 import { Chess } from 'chess.js'
-import { IPiece } from '@entities/piece/single/types'
 import { gsap } from 'gsap'
 import { pieceWeights } from '@shared/configs/pieces/weights'
 import { Players } from './types'
 import { Player } from '@entities/player'
 import { PlayerColor } from '@shared/configs/player/color'
+import { IPiece, King, Piece, Rook } from '@entities/piece'
+import { PieceType } from '@shared/configs/pieces/types'
 
 export class Game {
     private chess: Chess
     private chessBoard: ChessBoard
     private players: Players
     private currentColor: PlayerColor
+    private computerMoveRetries: number
 
     constructor(chessBoard: ChessBoard) {
         this.chess = new Chess()
@@ -23,6 +25,7 @@ export class Game {
             black: new Player(PlayerColor.BLACK)
         }
         this.currentColor = PlayerColor.WHITE
+        this.computerMoveRetries = 0
     }
 
     init() {
@@ -94,11 +97,26 @@ export class Game {
      * @param cell
      * @returns
      */
-    doNececcaryActionsOnMove(piece: IPiece, cell: THREE.Group | THREE.Mesh) {
+    doNececcaryActionsOnMove(piece: IPiece, cell: THREE.Group | THREE.Mesh, isCastling: boolean = false) {
         if (!piece.object) return
 
-        this.eatPiece(cell.name)
-        this.chess.move({ from: piece.cell, to: cell.name })
+        if (isCastling) {
+            const rook = this.chessBoard.getRookForCastling(cell.name)
+            const rookCellName = this.chessBoard.getCellNameForRookInCastling(cell.name)
+            const rookCell = this.chessBoard.scene.getObjectByName(rookCellName)
+
+            if (rook && rookCell) {
+                gsap.to(rook.object.position, {
+                    x: rookCell.position.x,
+                    y: rookCell.position.y + 0.5,
+                    z: rookCell.position.z,
+                    duration: 0.5,
+                    ease: 'power1.inOut'
+                })
+            }
+        } else {
+            this.eatPiece(cell.name)
+        }
 
         gsap.to(piece.object.position, {
             x: cell.position.x,
@@ -107,6 +125,8 @@ export class Game {
             duration: 0.5,
             ease: 'power1.inOut'
         })
+
+        this.chess.move({ from: piece.cell, to: cell.name })
 
         piece.setIsSelected(false)
         piece.setCell(cell.name)
@@ -163,7 +183,8 @@ export class Game {
         const piece = this.chessBoard?.getPieceByCell(from)
         if (!piece || !piece.object) return
 
-        this.doNececcaryActionsOnMove(piece, cell as THREE.Mesh)
+        // @ts-ignore
+        this.doNececcaryActionsOnMove(piece, cell as THREE.Mesh, move.isCastling)
     }
 
     /**
@@ -180,7 +201,13 @@ export class Game {
         const cell = this.chessBoard.cells[cellName]
         if (!cell || !cell.object || !cell.isAllowed) return false
 
-        this.doNececcaryActionsOnMove(piece, cell.object)
+        const isCastling: boolean =
+            piece?.type === PieceType.KING &&
+            piece.cell === 'e1' &&
+            !piece.getIsMoved() &&
+            (cellName === 'c1' || cellName === 'g1')
+
+        this.doNececcaryActionsOnMove(piece, cell.object, isCastling)
 
         return true
     }
