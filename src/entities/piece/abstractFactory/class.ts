@@ -6,6 +6,15 @@ import { PlayerColor } from '@shared/configs/player/color'
 import { PieceType } from '@shared/configs/pieces/types'
 
 export class PiecesAbstractFactory implements IPiecesAbstractFactory {
+    /**
+     * The function `createPieceFrom3dObject` maps 3D objects to chess pieces based on their names and
+     * creates corresponding Piece objects.
+     * @param {THREE.Group | THREE.Mesh} object - The `object` parameter in the
+     * `createPieceFrom3dObject` function is expected to be a THREE.Group or THREE.Mesh object
+     * representing a 3D piece in a scene. The function then creates a corresponding `Piece` object
+     * based on the name of the 3D object provided.
+     * @returns `Piece` object.
+     */
     createPieceFrom3dObject(object: THREE.Group | THREE.Mesh): Piece {
         let piece: Piece | null = null
 
