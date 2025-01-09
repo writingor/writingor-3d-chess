@@ -16,6 +16,9 @@ export class PieceFactory {
         let cell = initialCells[color][type][index - 1]
         let piece: Piece
 
+        /**
+         * Create Piece Object based on a specific type
+         */
         switch (type) {
             case PieceType.KING:
                 piece = new King({ name, cell, color, object })

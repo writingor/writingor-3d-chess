@@ -38,6 +38,10 @@ export class ChessBoard {
         }
     }
 
+    /**
+     * The `init` function sets the rotation of the scene, fills the chessboard, and dispatches an
+     * event for pieces being placed at the start.
+     */
     init() {
         this.scene.rotation.set(0, 1.58, 0)
         this.fillChessBoard(this.scene)
@@ -61,6 +65,14 @@ export class ChessBoard {
         }
     }
 
+    /**
+     * The `getFEN` function in TypeScript generates a FEN string representation of the current chess
+     * board state.
+     * @returns The `getFEN()` function returns a FEN (Forsyth-Edwards Notation) string representing
+     * the current state of a chess board. The FEN string includes the positions of the pieces on the
+     * board, the active color to move, castling availability, en passant target square, halfmove
+     * clock, and fullmove number.
+     */
     getFEN() {
         const board = Array(8)
             .fill('')
@@ -193,7 +205,14 @@ export class ChessBoard {
         return found
     }
 
-    movePieceToRoot = (object: THREE.Group | THREE.Mesh) => {
+    /**
+     * The function `movePieceToRoot` moves a given object to the root of the scene after a delay of
+     * 200 milliseconds.
+     * @param {THREE.Group | THREE.Mesh} object - The `object` parameter in the `movePieceToRoot`
+     * function is expected to be either a `THREE.Group` or a `THREE.Mesh` object. This function is
+     * designed to move the provided object to the root of the scene after a delay of 200 milliseconds.
+     */
+    movePieceToRoot(object: THREE.Group | THREE.Mesh) {
         setTimeout(() => {
             if (this.scene) {
                 this.scene.getObjectByProperty('name', 'Grid')?.add(object)
@@ -269,7 +288,15 @@ export class ChessBoard {
         this.selectCells(availableMoves)
     }
 
-    createCells = (object: THREE.Group | THREE.Mesh) => {
+    /**
+     * The function `createCells` generates a grid of 3D squares based on the bounding box of a given
+     * mesh object.
+     * @param {THREE.Group | THREE.Mesh} object - The `object` parameter in the `createCells` function
+     * is expected to be either a `THREE.Group` or a `THREE.Mesh`. The function first checks if the
+     * object is an instance of `THREE.Mesh` before proceeding with creating cells based on the
+     * geometry of the mesh.
+     */
+    createCells(object: THREE.Group | THREE.Mesh) {
         if (!(object instanceof THREE.Mesh)) return
 
         if (object.isMesh && object.geometry) {
