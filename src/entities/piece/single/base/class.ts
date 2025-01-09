@@ -3,7 +3,7 @@ import { IPiece } from './types'
 import { PlayerColor } from '@shared/configs/player/color'
 import { PieceType } from '@shared/configs/pieces/types'
 
-export class Piece implements IPiece {
+export abstract class Piece implements IPiece {
     type: PieceType
     name: string
     cell: string
